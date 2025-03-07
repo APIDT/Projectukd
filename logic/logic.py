@@ -4,9 +4,9 @@ from moviepy.editor import VideoFileClip
 
 app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
-MAX_DURATION = 5 * 60  # 5 хвилин у секундах
+MAX_DURATION = 5 * 60 
 
-# Створюємо папку для завантажень, якщо її немає
+
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
@@ -26,14 +26,14 @@ def upload_video():
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(filepath)
 
-    # Перевіряємо тривалість відео
+ 
     try:
         video = VideoFileClip(filepath)
         duration = video.duration
         video.close()
 
         if duration > MAX_DURATION:
-            os.remove(filepath)  # Видаляємо файл, якщо він занадто довгий
+            os.remove(filepath) 
             return jsonify({"error": "Відео занадто довге! Максимальна тривалість – 5 хвилин."}), 400
 
         return jsonify({"message": "Відео успішно завантажено!"})
