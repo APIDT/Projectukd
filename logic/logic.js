@@ -1,22 +1,45 @@
-document.getElementById("videoInput").addEventListener("change", function(event) {
-    const file = event.target.files[0];
+from flask import Flask, request, render_template, jsonify
+import os
+from moviepy.editor import VideoFileClip
 
-    if (file) {
-        const video = document.createElement("video");
-        video.preload = "metadata";
+app = Flask(__name__)
+UPLOAD_FOLDER = "uploads"
+MAX_DURATION = 5 * 60  # 5 хвилин у секундах
 
-        video.onloadedmetadata = function() {
-            window.URL.revokeObjectURL(video.src);
+# Створюємо папку для завантажень, якщо її немає
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
-            const duration = video.duration; // Отримуємо тривалість відео в секундах
-            const maxDuration = 5 * 60; // 5 хвилин у секундах
+@app.route("/")
+def upload_form():
+    return render_template("index.html")
 
-            if (duration > maxDuration) {
-                alert("Відео занадто довге! Максимальна тривалість – 5 хвилин.");
-                event.target.value = ""; // Очищаємо вибір файлу
-            }
-        };
+@app.route("/upload", methods=["POST"])
+def upload_video():
+    if "video" not in request.files:
+        return jsonify({"error": "Файл не знайдено"}), 400
 
-        video.src = URL.createObjectURL(file);
-    }
-});
+    file = request.files["video"]
+    if file.filename == "":
+        return jsonify({"error": "Файл не вибрано"}), 400
+
+    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(filepath)
+
+    # Перевіряємо тривалість відео
+    try:
+        video = VideoFileClip(filepath)
+        duration = video.duration
+        video.close()
+
+        if duration > MAX_DURATION:
+            os.remove(filepath)  # Видаляємо файл, якщо він занадто довгий
+            return jsonify({"error": "Відео занадто довге! Максимальна тривалість – 5 хвилин."}), 400
+
+        return jsonify({"message": "Відео успішно завантажено!"})
+
+    except Exception as e:
+        return jsonify({"error": f"Помилка обробки відео: {str(e)}"}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True)
