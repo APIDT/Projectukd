@@ -16,7 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from myapp import views  
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.video_list, name='video_list'),
+    path('video/<int:pk>/', views.video_detail, name='video_detail'),
+    path('video/create/', views.video_create, name='video_create'),
 ]
