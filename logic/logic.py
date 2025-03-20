@@ -7,7 +7,7 @@ def validate_video_duration(video):
         clip = VideoFileClip(video.temporary_file_path())
         duration = clip.duration
         clip.close()
-        if duration > 180:  # 3 хвилини = 180 секунд
+        if duration > 180:  # 3 хв
             raise ValidationError("Тривалість відео не повинна перевищувати 3 хвилини.")
     except Exception:
         raise ValidationError("Не вдалося перевірити тривалість відео.")
