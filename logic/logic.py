@@ -1,45 +1,21 @@
-from flask import Flask, request, render_template, jsonify
-import os
+from django.db import models
 from moviepy.editor import VideoFileClip
+from django.core.exceptions import ValidationError
 
-app = Flask(__name__)
-UPLOAD_FOLDER = "uploads"
-MAX_DURATION = 5 * 60 
-
-
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-@app.route("/")
-def upload_form():
-    return render_template("index.html")
-
-@app.route("/upload", methods=["POST"])
-def upload_video():
-    if "video" not in request.files:
-        return jsonify({"error": "Файл не знайдено"}), 400
-
-    file = request.files["video"]
-    if file.filename == "":
-        return jsonify({"error": "Файл не вибрано"}), 400
-
-    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(filepath)
-
- 
+def validate_video_duration(video):
     try:
-        video = VideoFileClip(filepath)
-        duration = video.duration
-        video.close()
+        clip = VideoFileClip(video.temporary_file_path())
+        duration = clip.duration
+        clip.close()
+        if duration > 180:  # 3 хвилини = 180 секунд
+            raise ValidationError("Тривалість відео не повинна перевищувати 3 хвилини.")
+    except Exception:
+        raise ValidationError("Не вдалося перевірити тривалість відео.")
 
-        if duration > MAX_DURATION:
-            os.remove(filepath) 
-            return jsonify({"error": "Відео занадто довге! Максимальна тривалість – 5 хвилин."}), 400
+class Video(models.Model):
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to="videos/", validators=[validate_video_duration])
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
-        return jsonify({"message": "Відео успішно завантажено!"})
-
-    except Exception as e:
-        return jsonify({"error": f"Помилка обробки відео: {str(e)}"}), 500
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    def __str__(self):
+        return self.title
