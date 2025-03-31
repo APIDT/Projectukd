@@ -1,7 +1,9 @@
+#Бібліотеки
 from django.db import models
 from moviepy.editor import VideoFileClip
 from django.core.exceptions import ValidationError
 
+# Функція для перевірки тривалості відео
 def validate_video_duration(video):
     try:
         clip = VideoFileClip(video.temporary_file_path())
@@ -12,6 +14,7 @@ def validate_video_duration(video):
     except Exception:
         raise ValidationError("Не вдалося перевірити тривалість відео.")
 
+# Модель для збереження відео
 class Video(models.Model):
     title = models.CharField(max_length=255)
     file = models.FileField(upload_to="videos/", validators=[validate_video_duration])
