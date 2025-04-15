@@ -1,12 +1,26 @@
+<<<<<<< Updated upstream
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Video, Comment
 from .forms import CommentForm
 from django.contrib.auth.decorators import login_required
+=======
+﻿from django.shortcuts import render
+from .models import Video
+from django.http import JsonResponse
+from rest_framework import viewsets
+from .models import VideoUploader, Video
+from .serializers import VideoUploaderSerializer, VideoSerializer
+# Create your views here.
+>>>>>>> Stashed changes
 
-def video_list(request):
+def index(request):
     videos = Video.objects.all()
-    return render(request, 'myapp/video_list.html', {'videos': videos})
+    context = {
+        'videos' :videos
+    }
+    return render(request,'index.html',context)
 
+<<<<<<< Updated upstream
 def video_detail(request, pk):
     video = get_object_or_404(Video, pk=pk)
     comments = video.comments.all() 
@@ -23,6 +37,19 @@ def video_detail(request, pk):
         form = CommentForm()
 
     return render(request, 'myapp/video_detail.html', {'video': video, 'comments': comments, 'form': form})
+=======
+def all_videos(request):
+    videos = list(Video.objects.values())  # перетворює queryset у список словників
+    return JsonResponse(videos, safe=False)
+>>>>>>> Stashed changes
 
-def video_create(request):
-    return render(request, 'myapp/video_create.html')
+def frontend(request):
+    return render(request, 'myapp/front/build/index.html')
+
+class VideoUploaderViewSet(viewsets.ModelViewSet):
+    queryset = VideoUploader.objects.all()
+    serializer_class = VideoUploaderSerializer
+
+class VideoViewSet(viewsets.ModelViewSet):
+    queryset = Video.objects.all()
+    serializer_class = VideoSerializer
