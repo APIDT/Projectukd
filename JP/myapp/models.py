@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 ﻿from django.db import models
-=======
-from django.db import models
->>>>>>> 7f76d61b24e5d534ee652eb302e666470160f858
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -45,8 +41,4 @@ class Comment(models.Model):
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
-<<<<<<< HEAD
         fields = ['title', 'file', 'uploaded_at']
-=======
-        fields = ['title', 'file', 'uploaded_at']
->>>>>>> 7f76d61b24e5d534ee652eb302e666470160f858

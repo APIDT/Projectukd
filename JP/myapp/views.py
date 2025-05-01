@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 ﻿from django.shortcuts import render, get_object_or_404, redirect
-=======
-from django.shortcuts import render, get_object_or_404, redirect
->>>>>>> 7f76d61b24e5d534ee652eb302e666470160f858
 from .models import Video, VideoUploader, Comment
 from .forms import CommentForm
 from django.contrib.auth.decorators import login_required
